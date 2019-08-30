@@ -3,7 +3,11 @@
 '''Common stuff, used in other modules'''
 
 from __future__ import print_function
-import re, os, fnmatch, sys, itertools
+import re
+import os
+import fnmatch
+import sys
+import itertools
 import sublime
 from sublime import Region
 from os.path import isdir, join, basename
@@ -35,8 +39,9 @@ def sort_nicely(names):
     """ Sort the given list in the way that humans expect.
     Source: http://www.codinghorror.com/blog/2007/12/sorting-for-humans-natural-sort-order.html
     """
-    convert = lambda text: int(text) if text.isdigit() else text.lower()
-    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+    def convert(text): return int(text) if text.isdigit() else text.lower()
+
+    def alphanum_key(key): return [convert(c) for c in re.split('([0-9]+)', key)]
     names.sort(key=alphanum_key)
 
 
@@ -82,7 +87,7 @@ def calc_width(view):
     '''
     width = view.settings().get('outline_width', 0.3)
     if isinstance(width, float):
-        width -= width//1  # must be less than 1
+        width -= width // 1  # must be less than 1
     elif isinstance(width, int if ST3 else long):  # assume it is pixels
         wport = view.viewport_extent()[0]
         width = 1 - round((wport - width) / wport, 2)
@@ -351,7 +356,7 @@ class outlineBaseCommand:
         start = region.begin()
         self.view.erase(edit, region)
         if header:
-            new_text = u"——[RENAME MODE]——" + u"—"*(region.size()-17)
+            new_text = u"——[RENAME MODE]——" + u"—" * (region.size() - 17)
         else:
             new_text = u"⠤ [RENAME MODE]"
         self.view.insert(edit, start, new_text)
@@ -381,7 +386,7 @@ class outlineBaseCommand:
         items   = []
         tab     = self.view.settings().get('tab_size')
         line    = self.view.line(self.sel.a if self.sel is not None else self.view.sel()[0].a)
-        content = self.view.substr(line).replace('\t', ' '*tab)
+        content = self.view.substr(line).replace('\t', ' ' * tab)
         ind     = re.compile('^(\s*)').match(content).group(1)
         level   = indent * int((len(ind) / tab) + 1) if ind else indent
         files   = []

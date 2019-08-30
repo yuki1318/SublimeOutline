@@ -1,9 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
 import sublime
-from os.path import basename
 
 ST3 = int(sublime.version()) >= 3000
 
@@ -20,7 +18,7 @@ def set_active_group(window, view, other_group):
         groups = window.num_groups()
         if groups == 1:
             width = calc_width(view)
-            cols = [0.0, width, 1.0] if other_group == 'left' else [0.0, 1-width, 1.0]
+            cols = [0.0, width, 1.0] if other_group == 'left' else [0.0, 1 - width, 1.0]
             window.set_layout({"cols": cols, "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1], [1, 0, 2, 1]]})
         elif view:
             group = get_group(groups, nag)
@@ -45,7 +43,7 @@ def set_view(view_id, window, ignore_existing, single_pane):
 
     if not view and not ignore_existing:
         # See if any reusable view exists in case of single_pane argument
-        any_path = lambda v: v.score_selector(0, "text.outline") > 0
+        def any_path(v): return v.score_selector(0, "text.outline") > 0
         view = first(window.views(), any_path if single_pane else same_path)
 
     if not view:
@@ -117,7 +115,7 @@ def show(window, view_id=None, ignore_existing=False, single_pane=False, other_g
             window.set_view_index(v, 1, 0)
 
     window.focus_view(prev_focus)
-    
+
     refresh_sym_view(view, symlist, file_path)
 
 def refresh_sym_view(sym_view, symlist, path):
@@ -125,9 +123,9 @@ def refresh_sym_view(sym_view, symlist, path):
     k = []
     for symbol in symlist:
         rng, sym = symbol
-        l.append(sym)
+        l.append(sym.replace('\n',''))
         k.append((rng.a, rng.b))
-    if sym_view != None:
+    if sym_view is not None:
         sym_view.settings().erase('symlist')
         sym_view.settings().erase('symkeys')
         sym_view.run_command('outline_refresh', {'symlist': l, 'symkeys': k, 'path': path})
@@ -145,7 +143,7 @@ def get_sidebar_views_groups(view):
             sym_group, i = window.get_view_index(sym_view)
         if u'𝌆' in v.name() and v.id() != sym_view.id():
             fb_view = v
-            if fb_view != None:
+            if fb_view is not None:
                 fb_group, j = window.get_view_index(fb_view)
 
     return (sym_view, sym_group, fb_view, fb_group)

@@ -123,7 +123,7 @@ def refresh_sym_view(sym_view, symlist, path):
     k = []
     for symbol in symlist:
         rng, sym = symbol
-        l.append(' '.join(sym.split()).replace('\n',''))
+        l.append(sym.replace('\n',''))
         k.append((rng.a, rng.b))
     if sym_view is not None:
         sym_view.settings().erase('symlist')

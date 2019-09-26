@@ -1,4 +1,4 @@
-import sublime
+# import sublime
 from sublime import Region
 from sublime_plugin import WindowCommand, TextCommand, EventListener
 from .show import show, refresh_sym_view, get_sidebar_views_groups, get_sidebar_status
@@ -56,9 +56,9 @@ class OutlineEventHandler(EventListener):
 
 		active_view = None
 		for group in range(window.num_groups()):
-			if group != sym_group and group != fb_group:
+			if group is not sym_group and group is not fb_group:
 				active_view = window.active_view_in_group(group)
-		if active_view != None:
+		if active_view is not None:
 			symkeys = sym_view.settings().get('symkeys')
 			if not symkeys:
 				return
@@ -81,13 +81,21 @@ class OutlineEventHandler(EventListener):
 
 		sym_view, sym_group, fb_view, fb_group = get_sidebar_views_groups(view)
 
-		if sym_view != None:
-			if sym_view.settings().get('current_file') == view.file_name() and view.file_name() != None:
+		if sym_view is not None:
+			if sym_view.settings().get('current_file') == view.file_name() and view.file_name() is not None:
 				return
 			else:
 				sym_view.settings().set('current_file', view.file_name())
 
 		symlist = view.get_symbols()
+		for symbol in symlist:
+			rng    , sym = symbol
+			_sym   = view.substr(rng)
+			__sym  = ' '.join(_sym.split()).replace('\n','')
+			adjust = len(_sym) - len(__sym)
+			rng.b  = rng.b - adjust
+			symbol = [rng, sym]
+			# print([rng.b - rng.a, len(sym), adjust, sym, view.substr(rng)])
 
 		refresh_sym_view(sym_view, symlist, view.file_name())
 
@@ -97,7 +105,7 @@ class OutlineEventHandler(EventListener):
 		# this is not absolutely necessary, and prevents views that do not have a file reference from displaying
 		# the symbol list
 		# but it solves a console error if the console is activiated, as console is also a view....
-		if view.file_name() == None:
+		if view.file_name() is None:
 			return
 
 		if not get_sidebar_status(view):
@@ -105,9 +113,9 @@ class OutlineEventHandler(EventListener):
 
 		sym_view, sym_group, fb_view, fb_group = get_sidebar_views_groups(view)
 
-		if sym_view != None:
+		if sym_view is not None:
 			# Note here is the only place that differs from on_activate_view
-			if sym_view.settings().get('current_file') != view.file_name():
+			if sym_view.settings().get('current_file') is not view.file_name():
 				sym_view.settings().set('current_file', view.file_name())
 
 		symlist = view.get_symbols()

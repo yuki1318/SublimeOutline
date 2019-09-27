@@ -89,13 +89,9 @@ class OutlineEventHandler(EventListener):
 
 		symlist = view.get_symbols()
 		for symbol in symlist:
-			rng    , sym = symbol
-			_sym   = view.substr(rng)
-			__sym  = ' '.join(_sym.split()).replace('\n','')
-			adjust = len(_sym) - len(__sym)
-			rng.b  = rng.b - adjust
+			rng , sym = symbol
+			rng.b  = rng.a
 			symbol = [rng, sym]
-			# print([rng.b - rng.a, len(sym), adjust, sym, view.substr(rng)])
 
 		refresh_sym_view(sym_view, symlist, view.file_name())
 

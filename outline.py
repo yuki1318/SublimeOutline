@@ -63,7 +63,7 @@ class OutlineEventHandler(EventListener):
 			if not symkeys:
 				return
 			region_position = symkeys[row]
-			r = Region(region_position[0], region_position[1])
+			r = Region(region_position[0], region_position[0])
 			active_view.show_at_center(r)
 			active_view.sel().clear()
 			active_view.sel().add(r)
@@ -89,9 +89,12 @@ class OutlineEventHandler(EventListener):
 
 		symlist = view.get_symbols()
 		for symbol in symlist:
-			rng , sym = symbol
-			rng.b  = rng.a
-			symbol = [rng, sym]
+			rng, sym = symbol
+			_sym     = view.substr(rng)
+			__sym    = ' '.join(_sym.split()).replace('\n','')
+			adjust   = len(_sym) - len(__sym)
+			rng.b    = rng.b - adjust
+			symbol   = [rng, sym]
 
 		refresh_sym_view(sym_view, symlist, view.file_name())
 

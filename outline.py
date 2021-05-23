@@ -40,7 +40,10 @@ class OutlineToggleSortCommand(TextCommand):
 
 class OutlineEventHandler(EventListener):
 	def on_selection_modified(self, view):
-		if 'outline.hidden-tmLanguage' not in view.settings().get('syntax'):
+		try:
+			if 'outline.hidden-tmLanguage' not in view.settings().get('syntax'):
+				return
+		except BaseException:
 			return
 
 		sym_view, sym_group, fb_view, fb_group = get_sidebar_views_groups(view)

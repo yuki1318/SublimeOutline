@@ -68,7 +68,7 @@ def show(window, view_id=None, ignore_existing=False, single_pane=False, other_g
 	prev_focus = None
 	if other_group:
 		prev_focus = window.active_view()
-		symlist = prev_focus.get_symbols()
+		symlist = prev_focus.symbols()
 		file_path = prev_focus.file_name()
 		# simulate 'toggle sidebar':
 		if prev_focus and 'outline' in prev_focus.scope_name(0):

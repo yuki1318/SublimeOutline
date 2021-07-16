@@ -35,7 +35,7 @@ class OutlineToggleSortCommand(TextCommand):
 				v.settings().set('outline_alphabetical', not v.settings().get('outline_alphabetical'))
 				sym_view = v
 
-		symlist = self.view.get_symbols()
+		symlist = self.view.symbols()
 		refresh_sym_view(sym_view, symlist, self.view.file_name())
 
 class OutlineEventHandler(EventListener):
@@ -90,7 +90,7 @@ class OutlineEventHandler(EventListener):
 			else:
 				sym_view.settings().set('current_file', view.file_name())
 
-		symlist = view.get_symbols()
+		symlist = view.symbols()
 		for symbol in symlist:
 			rng, sym = symbol
 			_sym     = view.substr(rng)
@@ -120,5 +120,5 @@ class OutlineEventHandler(EventListener):
 			if sym_view.settings().get('current_file') is not view.file_name():
 				sym_view.settings().set('current_file', view.file_name())
 
-		symlist = view.get_symbols()
+		symlist = view.symbols()
 		refresh_sym_view(sym_view, symlist, view.file_name())

@@ -90,14 +90,15 @@ class OutlineEventHandler(EventListener):
 			else:
 				sym_view.settings().set('current_file', view.file_name())
 
-		symlist = view.get_symbols()
+		symlist = view.symbol_regions()
 		for symbol in symlist:
-			rng, sym = symbol
-			_sym     = view.substr(rng)
-			__sym    = ' '.join(_sym.split()).replace('\n','')
-			adjust   = len(_sym) - len(__sym)
-			rng.b    = rng.b - adjust
-			symbol   = [rng, sym]
+			rng    = symbol.region
+			sym    = symbol.name
+			_sym   = view.substr(rng)
+			__sym  = ' '.join(_sym.split()).replace('\n','')
+			adjust = len(_sym) - len(__sym)
+			rng.b  = rng.b - adjust
+			symbol = [rng, sym]
 
 		refresh_sym_view(sym_view, symlist, view.file_name())
 

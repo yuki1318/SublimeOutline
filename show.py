@@ -68,7 +68,7 @@ def show(window, view_id=None, ignore_existing=False, single_pane=False, other_g
 	prev_focus = None
 	if other_group:
 		prev_focus = window.active_view()
-		symlist = prev_focus.get_symbols()
+		symlist = prev_focus.symbol_regions()
 		file_path = prev_focus.file_name()
 		# simulate 'toggle sidebar':
 		if prev_focus and 'outline' in prev_focus.scope_name(0):
@@ -123,7 +123,10 @@ def refresh_sym_view(sym_view, symlist, path):
 	l = []
 	k = []
 	for symbol in symlist:
-		rng, sym = symbol
+		line_str = sublime.active_window().active_view().substr(sublime.active_window().active_view().line(symbol.region))
+		line_indent = line_str.replace(line_str.lstrip().lstrip('\t'), '')
+		rng = symbol.region
+		sym = line_indent + symbol.name
 		l.append(sym.replace('\n',''))
 		k.append((rng.a, rng.b))
 	if sym_view is not None:

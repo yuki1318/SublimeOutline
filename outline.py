@@ -9,12 +9,15 @@ class OutlineCommand(WindowCommand):
 
 class OutlineCloseSidebarCommand(WindowCommand):
 	def run(self):
+		active_view = self.window.active_view()
+
 		for v in self.window.views():
 			if u'𝌆' in v.name():
 				self.window.focus_view(v)
 				self.window.run_command('close_file')
 
 		self.window.set_layout({"cols": [0.0, 1.0], "rows": [0.0, 1.0], "cells": [[0, 0, 1, 1]]})
+		self.window.focus_view(active_view)
 
 class OutlineRefreshCommand(TextCommand):
 	def run(self, edit, symlist=None, symkeys=None, path=None, to_expand=None, toggle=None):
@@ -62,7 +65,20 @@ class OutlineEventHandler(EventListener):
 			if group is not sym_group and group is not fb_group:
 				active_view = window.active_view_in_group(group)
 		if active_view is not None:
+			symkeys = None
+			# get the symbol list
+			symlist = active_view.get_symbols()
+			print(symlist)
+			# depending on setting, set different regions
+			if sym_view.settings().get('outline_main_view_highlight_mode') == 'cursor':
+				symbol_line_ends = [active_view.line(range.a).end() for range, symbol in symlist]
+				symkeys = list(zip(symbol_line_ends, symbol_line_ends))
+			if sym_view.settings().get('outline_main_view_highlight_mode') == 'symbol':
 			symkeys = sym_view.settings().get('symkeys')
+			if sym_view.settings().get('outline_main_view_highlight_mode') == 'block':
+				symbol_block_begins = [active_view.line(range.a).begin() for range, symbol in symlist]
+				symbol_blocks_ends = [x - 1 for x in symbol_block_begins[1:len(symbol_block_begins)]] + [active_view.size()]
+				symkeys = list(zip(symbol_block_begins, symbol_blocks_ends))
 			if not symkeys:
 				return
 			region_position = symkeys[row]
@@ -129,7 +145,7 @@ class OutlineEventHandler(EventListener):
 		# get the current cursor location
 		point = view.sel()[0].begin()
 		# get the current symbol and its line in outline
-		range_lows = [range.a for range, symbol in symlist]
+		range_lows = [view.line(range.a).begin() for range, symbol in symlist]
 		range_sorted = [0] + range_lows[1:len(range_lows)] + [view.size()]
 		sym_line = binary_search(range_sorted, point) - 1
 

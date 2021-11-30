@@ -54,7 +54,7 @@ def set_view(view_id, window, ignore_existing, single_pane):
 		view.set_syntax_file('Packages/Outline/outline.hidden-tmLanguage')
 		view.set_scratch(True)
 		if view.settings().get('outline_inherit_color_scheme'):
-		view.settings().set('color_scheme', active_view.settings().get('color_scheme'))
+			view.settings().set('color_scheme', active_view.settings().get('color_scheme'))
 		else:
 			view.settings().add_on_change('color_scheme', lambda: set_proper_scheme(view))
 
@@ -158,7 +158,7 @@ def get_sidebar_status(view):
 			sidebar_on = True
 
 	return sidebar_on
-	
+
 # given a sorted array, returns the location of x if inserted into the array
 def binary_search(array, x):
 	low = 0

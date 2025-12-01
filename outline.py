@@ -39,7 +39,7 @@ class OutlineToggleSortCommand(TextCommand):
 				sym_view = v
 
 		symlist = self.view.symbols()
-		refresh_sym_view(sym_view, symlist, self.view.file_name())
+		refresh_sym_view(sym_view, symlist, self.view.file_name(), self.view.id())
 
 class OutlineEventHandler(EventListener):
 	def on_selection_modified(self, view):
@@ -60,10 +60,23 @@ class OutlineEventHandler(EventListener):
 
 		(row, col) = sym_view.rowcol(sym_view.sel()[0].begin())
 
+		# 保存されたview IDから元のビューを取得
+		source_view_id = sym_view.settings().get('outline_source_view_id')
 		active_view = None
-		for group in range(window.num_groups()):
-			if group is not sym_group and group is not fb_group:
-				active_view = window.active_view_in_group(group)
+		if source_view_id:
+			# view IDから直接ビューを取得
+			for v in window.views():
+				if v.id() == source_view_id:
+					active_view = v
+					break
+		
+		# フォールバック: view IDが見つからない場合は従来の方法
+		if active_view is None:
+			for group in range(window.num_groups()):
+				if group is not sym_group and group is not fb_group:
+					active_view = window.active_view_in_group(group)
+					break
+		
 		if active_view is not None:
 			symkeys = None
 			# get the symbol list
@@ -104,6 +117,8 @@ class OutlineEventHandler(EventListener):
 				return
 			else:
 				sym_view.settings().set('current_file', view.file_name())
+				# アクティブ化されたビューのIDを保存
+				sym_view.settings().set('outline_source_view_id', view.id())
 
 		symlist = view.symbols()
 		for symbol in symlist:
@@ -134,6 +149,8 @@ class OutlineEventHandler(EventListener):
 			# Note here is the only place that differs from on_activate_view
 			if sym_view.settings().get('current_file') is not view.file_name():
 				sym_view.settings().set('current_file', view.file_name())
+				# ビューのIDも保存
+				sym_view.settings().set('outline_source_view_id', view.id())
 
 		symlist = view.symbols()
 		refresh_sym_view(sym_view, symlist, view.file_name())

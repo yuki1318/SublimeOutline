@@ -124,14 +124,17 @@ def show(window, view_id=None, ignore_existing=False, single_pane=False, other_g
 
 	window.focus_view(prev_focus)
 
-	refresh_sym_view(view, symlist, file_path)
+	source_view_id = prev_focus.id() if prev_focus else None
+	refresh_sym_view(view, symlist, file_path, source_view_id)
 
-def refresh_sym_view(sym_view, symlist, path):
+def refresh_sym_view(sym_view, symlist, path, source_view_id=None):
 	symlist__ = [symbol for range, symbol in symlist]
 	symkeys = [(range.a, range.b) for range, symbol in symlist]
 	if sym_view is not None:
 		sym_view.settings().erase('symlist')
 		sym_view.settings().erase('symkeys')
+		if source_view_id is not None:
+			sym_view.settings().set('outline_source_view_id', source_view_id)
 		sym_view.run_command('outline_refresh', {'symlist': symlist__, 'symkeys': symkeys, 'path': path})
 
 def get_sidebar_views_groups(view):

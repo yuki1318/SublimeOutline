@@ -48,6 +48,10 @@
   // false: default because of losing parent dependences.
   "outline_alphabetical": false,
 
+  // String used to indent nested symbols in the Outline pane, repeated once per
+  // nesting level (nesting level is derived from each symbol's source indentation).
+  "outline_symbol_indent": " ",
+
   // true: default, outline is in sync with current file position
   // false: no syncing, may be useful if use alphabetical sort
   "outline_sync": true,

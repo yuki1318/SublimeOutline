@@ -35,6 +35,16 @@ def first(seq, pred):
 	return next((item for item in seq if pred(item)), None)
 
 
+def get_symbol_indent(view, pt):
+	'''rebuild the nesting indent ST4 no longer includes in view.symbols() results'''
+	tab_size = view.settings().get('tab_size') or 4
+	line_text = view.substr(view.line(pt))
+	leading = re.match(r'^[ \t]*', line_text).group(0)
+	level = len(leading.expandtabs(tab_size)) // tab_size
+	indent_unit = sublime.load_settings('outline.sublime-settings').get('outline_symbol_indent', ' ')
+	return indent_unit * level
+
+
 def sort_nicely(names):
 	""" Sort the given list in the way that humans expect.
 	Source: http://www.codinghorror.com/blog/2007/12/sorting-for-humans-natural-sort-order.html

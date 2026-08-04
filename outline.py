@@ -1,4 +1,4 @@
-# import sublime
+import sublime
 from sublime import Region
 from sublime_plugin import WindowCommand, TextCommand, EventListener
 from .show import show, refresh_sym_view, get_sidebar_views_groups, get_sidebar_status, binary_search
@@ -23,7 +23,8 @@ class OutlineRefreshCommand(TextCommand):
 	def run(self, edit, symlist=None, symkeys=None, path=None, to_expand=None, toggle=None):
 		self.view.erase(edit, Region(0, self.view.size()))
 		if symlist and self.view.settings().get('outline_alphabetical'):
-			symlist, symkeys = (list(t) for t in zip(*sorted(zip(symlist, symkeys))))
+			indent_unit = sublime.load_settings('outline.sublime-settings').get('outline_symbol_indent', ' ')
+			symlist, symkeys = (list(t) for t in zip(*sorted(zip(symlist, symkeys), key=lambda t: t[0].lstrip(indent_unit))))
 		self.view.insert(edit, 0, "\n".join(symlist))
 		self.view.settings().set('symlist', symlist)
 		self.view.settings().set('symkeys', symkeys)
@@ -39,7 +40,7 @@ class OutlineToggleSortCommand(TextCommand):
 				sym_view = v
 
 		symlist = self.view.symbols()
-		refresh_sym_view(sym_view, symlist, self.view.file_name(), self.view.id())
+		refresh_sym_view(sym_view, symlist, self.view.file_name(), self.view.id(), source_view=self.view)
 
 class OutlineEventHandler(EventListener):
 	def on_selection_modified(self, view):
@@ -129,7 +130,7 @@ class OutlineEventHandler(EventListener):
 			rng.b    = rng.b - adjust
 			symbol   = [rng, sym]
 
-		refresh_sym_view(sym_view, symlist, view.file_name())
+		refresh_sym_view(sym_view, symlist, view.file_name(), source_view=view)
 
 	def on_pre_save(self, view):
 		if u'𝌆' in view.name():
@@ -153,7 +154,7 @@ class OutlineEventHandler(EventListener):
 				sym_view.settings().set('outline_source_view_id', view.id())
 
 		symlist = view.symbols()
-		refresh_sym_view(sym_view, symlist, view.file_name())
+		refresh_sym_view(sym_view, symlist, view.file_name(), source_view=view)
 
 		# sync the outline view with current file location
 		if view.window() is None or not sym_view.settings().get('outline_sync'):
